@@ -52,9 +52,8 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(sbindir)"
 PROGRAMS = $(sbin_PROGRAMS)
 am_ospfn_OBJECTS = ospfn-ccnx_opaque_lsa.$(OBJEXT) \
-	ospfn-tables.$(OBJEXT) ospfn-ndn_route.$(OBJEXT) \
-	ospfn-utility.$(OBJEXT) ospfn-ccn_fib.$(OBJEXT) \
-	ospfn-ospfn.$(OBJEXT)
+	ospfn-tables.$(OBJEXT) ospfn-utility.$(OBJEXT) \
+	ospfn-ccn_fib.$(OBJEXT) ospfn-ospfn.$(OBJEXT)
 ospfn_OBJECTS = $(am_ospfn_OBJECTS)
 ospfn_DEPENDENCIES = ../ospfclient/libospfapiclient.la \
 	../ospfd/libospf.la ../lib/libzebra.la
@@ -243,7 +242,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ospfn_SOURCES = \
-	ccnx_opaque_lsa.c tables.c ndn_route.c utility.c ccn_fib.c ospfn.c
+	ccnx_opaque_lsa.c tables.c utility.c ccn_fib.c ospfn.c
 
 ospfn_LDADD = ../ospfclient/libospfapiclient.la \
 	../ospfd/libospf.la ../lib/libzebra.la @LIBCAP@ -lcrypto -lccn
@@ -339,7 +338,6 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ospfn-ccn_fib.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ospfn-ccnx_opaque_lsa.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ospfn-ndn_route.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ospfn-ospfn.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ospfn-tables.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ospfn-utility.Po@am__quote@
@@ -392,20 +390,6 @@ ospfn-tables.obj: tables.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tables.c' object='ospfn-tables.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ospfn_CFLAGS) $(CFLAGS) -c -o ospfn-tables.obj `if test -f 'tables.c'; then $(CYGPATH_W) 'tables.c'; else $(CYGPATH_W) '$(srcdir)/tables.c'; fi`
-
-ospfn-ndn_route.o: ndn_route.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ospfn_CFLAGS) $(CFLAGS) -MT ospfn-ndn_route.o -MD -MP -MF $(DEPDIR)/ospfn-ndn_route.Tpo -c -o ospfn-ndn_route.o `test -f 'ndn_route.c' || echo '$(srcdir)/'`ndn_route.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/ospfn-ndn_route.Tpo $(DEPDIR)/ospfn-ndn_route.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ndn_route.c' object='ospfn-ndn_route.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ospfn_CFLAGS) $(CFLAGS) -c -o ospfn-ndn_route.o `test -f 'ndn_route.c' || echo '$(srcdir)/'`ndn_route.c
-
-ospfn-ndn_route.obj: ndn_route.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ospfn_CFLAGS) $(CFLAGS) -MT ospfn-ndn_route.obj -MD -MP -MF $(DEPDIR)/ospfn-ndn_route.Tpo -c -o ospfn-ndn_route.obj `if test -f 'ndn_route.c'; then $(CYGPATH_W) 'ndn_route.c'; else $(CYGPATH_W) '$(srcdir)/ndn_route.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/ospfn-ndn_route.Tpo $(DEPDIR)/ospfn-ndn_route.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ndn_route.c' object='ospfn-ndn_route.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ospfn_CFLAGS) $(CFLAGS) -c -o ospfn-ndn_route.obj `if test -f 'ndn_route.c'; then $(CYGPATH_W) 'ndn_route.c'; else $(CYGPATH_W) '$(srcdir)/ndn_route.c'; fi`
 
 ospfn-utility.o: utility.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ospfn_CFLAGS) $(CFLAGS) -MT ospfn-utility.o -MD -MP -MF $(DEPDIR)/ospfn-utility.Tpo -c -o ospfn-utility.o `test -f 'utility.c' || echo '$(srcdir)/'`utility.c

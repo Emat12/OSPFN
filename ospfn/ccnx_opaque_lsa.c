@@ -8,10 +8,8 @@
 #include<ctype.h>
 #include<stdlib.h>
 
-#include "ndn_route.h"
 #include "ccnx_opaque_lsa.h"
 #include "utility.h"
-#include "uthash.h"
 #include "ospfn.h"
 #include "lib/table.h"
 

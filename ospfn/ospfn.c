@@ -27,10 +27,8 @@
 #include "ospfd/ospf_lsa.h"
 #include "lib/table.h"
 
-#include "ndn_route.h"
 #include "ccnx_opaque_lsa.h"
 #include "utility.h"
-#include "uthash.h"
 #include "ospfn.h"
 
 #include "ospfd/ospf_opaque.h"
@@ -840,7 +838,7 @@ int main(int argc, char *argv[])
     process_adjacent();
 
     //insert code here for routing table claculation
-    calculate_route();
+//    calculate_route();
 
     //insert code here for FIB manipulation
 //    manipulate_fib();	
