@@ -46,7 +46,7 @@ static int opaque_id=1;
 static int CCN_MAX_NEXT_HOPS=2;
 static char OSPFN_DEFAULT_CONFIG_FILE[] = "ospfn.conf";
 static char OSPFN_LOCAL_HOST[] = "127.0.0.1";
-
+char *loggingDir;
 /* privileges struct. 
  * set cap_num_* and uid/gid to nothing to use NULL privs
  * as ospfapiclient links in libospf.a which uses privs.
@@ -64,6 +64,7 @@ struct option longopts[] =
     { "daemon",      no_argument,       NULL, 'd'},
     { "config_file", required_argument, NULL, 'f'},
     { "help",        no_argument,       NULL, 'h'},
+    { "log",         no_argument,       NULL, 'n'},
     { 0 }
 };    
 
@@ -257,7 +258,33 @@ void process_command_ccnname(char *command)
 
 }
 
-void process_conf_command(char *command)
+void process_command_logdir(char *command)
+{
+        if(command==NULL)
+        {
+        printf(" Wrong Command Format ( logdir /path/to/logdir )\n");
+        //writeLogg(logFile,"Wrong Command Format [logdir /path/to/logdir]\n");
+        return;
+        }
+        char *rem;
+        const char *sep=" \t\n";
+        char *dir;
+
+        dir=strtok_r(command,sep,&rem);
+
+        if(dir==NULL)
+        {
+        printf(" Wrong Command Format ( logdir /path/to/logdir/ )\n");
+        //writeLogg(logFile,"Wrong Command Format [logdir  /path/to/logdir]\n");
+        return;
+        }
+        loggingDir=strdup(dir);
+        //printf(" %s \n",loggingDir);
+}
+
+
+
+void process_conf_command(char *command,int isLogOnlyProcessing)
 {
     const char *separators=" \t\n";
     char *remainder=NULL;
@@ -270,12 +297,26 @@ void process_conf_command(char *command)
     //if(cmd_type!=NULL)
       //  printf("\n%s %s",cmd_type,remainder);
 
-    if(!strcmp(cmd_type, "ccnmaxnexthops"))
+    if(!strcmp(cmd_type, "ccnmaxnexthops") )
+      {
+       if (isLogOnlyProcessing ==0)
         process_command_ccnmaxnexthops(remainder);
-    else if(!strcmp(cmd_type,"ccnneighbor"))
+      }
+    else if(!strcmp(cmd_type,"ccnneighbor")) 
+      { 
+      if (isLogOnlyProcessing == 0)
         process_command_ccnneighbor(remainder);
-    else if(!strcmp(cmd_type,"ccnname"))
+      }
+    else if(!strcmp(cmd_type,"ccnname") )
+       {
+       if (isLogOnlyProcessing == 0)
         process_command_ccnname(remainder);
+       }
+    else if(!strcmp(cmd_type,"logdir") )
+       {
+       if (isLogOnlyProcessing == 1)
+        process_command_logdir(remainder);
+       }
     else 
 	{
 	writeLogg(logFile,"Wrong configuration command\n");
@@ -283,7 +324,7 @@ void process_conf_command(char *command)
 	}
 }
 
-int readConfigFile(char *filename)
+int readConfigFile(char *filename, int isLogOnlyProcessing)
 {
     FILE *cfg;
     char buf[1024];
@@ -306,7 +347,7 @@ int readConfigFile(char *filename)
        // printf("\n");
        writeLogg(logFile,buf);
        writeLogg(logFile,"\n"); 
-       process_conf_command(buf);	
+       process_conf_command(buf,isLogOnlyProcessing);	
     }
 
     fclose(cfg);
@@ -719,10 +760,11 @@ int main(int argc, char *argv[])
     struct thread main_thread;
     int res;
     int daemon_mode = 0;
+    int isLoggingEnabled = 1;
     char *config_file = OSPFN_DEFAULT_CONFIG_FILE;
+    
 
-
-    while ((res = getopt_long(argc, argv, "df:h", longopts, 0)) != -1) {
+    while ((res = getopt_long(argc, argv, "df:hn", longopts, 0)) != -1) {
         switch (res) {
             case 'd':
                 daemon_mode = 1;
@@ -730,6 +772,9 @@ int main(int argc, char *argv[])
             case 'f':
                 config_file = optarg;
                 break;
+            case 'n':
+		isLoggingEnabled = 0;
+		break;
             case 'h':
             default:
                 usage(argv[0]);
@@ -743,7 +788,12 @@ int main(int argc, char *argv[])
     origin_table = origin_hash_create();
     prefix_table = prefix_hash_create();
 
-    logFile=startLogging();
+   readConfigFile(config_file,1);
+
+  // printf("%s from main\n",loggingDir);
+ 
+    if(isLoggingEnabled)
+     logFile=startLogging( loggingDir );
 
 	
     
@@ -784,7 +834,7 @@ int main(int argc, char *argv[])
     /* Synchronize database with OSPF daemon. */
     ospf_apiclient_sync_lsdb (oclient);
 
-    readConfigFile(config_file);	
+    readConfigFile(config_file,0);	
 
     //insert code here for processing neighbors and ccnnames and call them 
     process_adjacent();

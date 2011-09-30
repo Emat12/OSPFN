@@ -42,6 +42,7 @@ struct hash *prefix_table;
 struct hash *origin_table;
 
 char  *logFile;
+char  *loggDir;
 
 //----------Data Structure Added for ospfn -------
 //data structures 
@@ -54,8 +55,9 @@ char  *logFile;
 void process_command_ccnmaxnexthops(char *command);
 void process_command_ccnneighbor(char *command);
 void process_command_ccnname(char *command);
-void process_conf_command(char *command);
-int readConfigFile(char *filename);
+void process_command_logdir(char *command);
+void process_conf_command(char *command, int isLogOnlyProcessing);
+int readConfigFile(char *filename , int isLogOnlyProcessing);
 //static void process_adjacent();
 
 

@@ -1,3 +1,7 @@
+
+
+
+
 int compute_hash(char *data);
 char * strToLower(char *str);
 char * align_data(char *data);
@@ -6,5 +10,5 @@ char * substring(const char* str, size_t begin, size_t len);
 
 char * lpad( unsigned int num, unsigned int padNumber);
 char * getLocalTimeStamp(void);
-char * startLogging(void);
+char * startLogging(char *loggingDir);
 void writeLogg(const char  *file, const char *logMsg);

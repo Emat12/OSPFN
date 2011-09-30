@@ -16,6 +16,7 @@
 #include "utility.h"
 #include "str.h"
 
+
 int compute_hash(char *data)
 {
 
@@ -114,7 +115,7 @@ char * getLocalTimeStamp(void)
 
 }
 
-char * startLogging(void)
+char * startLogging(char *loggingDir)
 {
   struct passwd pd;
   struct passwd* pwdptr=&pd;
@@ -125,34 +126,72 @@ char * startLogging(void)
   char logFileName[222];
   char *ret;
   int status;
+  struct stat st;
+  int isLogDirExists=0;
   char *time=getLocalTimeStamp();
 
-  if ((getpwuid_r(getuid(),pwdptr,pwdbuffer,pwdlinelen,&tempPwdPtr))!=0)
-     perror("getpwuid_r() error.");
-  else
-  {
-	strcpy(logDir,pd.pw_dir);
-	strcat(logDir,"/ospfnLog");
- 	struct stat st;
-	// if log directory does not exists create directory with read and write permission in user home directory
-	if(stat(logDir,&st) != 0)
-		status = mkdir(logDir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);	
+  //printf(" S L : %s \n",loggingDir);
+
+ if(loggingDir!=NULL)
+ {
+  if( stat( loggingDir, &st)==0)
+    {
+        if ( st.st_mode & S_IFDIR )
+	{
+		if( st.st_mode & S_IWUSR)
+                  {
+			isLogDirExists=1;
+			strcpy(logDir,loggingDir);
+                  }
+                  else printf("User do not have write permission to %s \n",loggingDir);
+	}
+	else printf("Provided path for %s is not a directory!!\n",loggingDir);
+    }
+  else printf("Log directory: %s does not exists\n",loggingDir);
+  } 
+  
+  if(isLogDirExists == 0)
+  	{
+	  if ((getpwuid_r(getuid(),pwdptr,pwdbuffer,pwdlinelen,&tempPwdPtr))!=0)
+     		perror("getpwuid_r() error.");
+  	  else
+  		{
+		strcpy(logDir,pd.pw_dir);
+		strcat(logDir,"/ospfnLog");
+ 		//struct stat st;
+		// if log directory does not exists create directory with read and write permission in user home directory
+		if(stat(logDir,&st) != 0)
+			status = mkdir(logDir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);	
+        	}
+	}	
+ 	//printf(" %s \n",logDir);	
 	strcpy(logFileName,logDir);
-	strcat(logFileName,"/");
+ 	//printf(" lf: %s \n",logFileName);	
+  if( logDir[strlen(logDir)-1]!='/')
+	      strcat(logFileName,"/");
+	//printf(" lf: %s \n",logFileName);
 	strcat(logFileName,time);
+	//printf(" lf: %s \n",logFileName);
 	strcat(logFileName,".log");
+	//printf(" lf: %s \n",logFileName);
         ret=(char *)malloc(strlen(logFileName));
         ret=strndup(logFileName,strlen(logFileName));	
 	return ret;	
-   }
+   			
 
-  return NULL;
 
 }
 
 void writeLogg(const char  *file, const char *logMsg)
 {
+ if(file!=NULL){
 	FILE *fp=fopen(file,"a");
-	fprintf(fp,"%s",logMsg);
-	fclose(fp);
+		if(fp!=NULL)
+		{
+		fprintf(fp,"%s",logMsg);
+		fclose(fp);
+		}
+//	fclose(fp);
+	}
 }
+
