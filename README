@@ -85,8 +85,8 @@ You can specify other directories.
 (b) the --disable options are to avoid compiling Quagga components that we 
 do not need.
 
-Now we need to create two directories: /usr/local/etc/quagga 
-and /var/run/quagga-state (or the directoryyou specified in configure).
+Next we need to create two directories: /usr/local/etc/quagga 
+and /var/run/quagga-state (or any directories you specified in configure).
 Both directories must be readable and writable by the user quagga and 
 group quagga.  
 
