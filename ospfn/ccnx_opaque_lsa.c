@@ -46,8 +46,8 @@ void ccnx_name_opaque_lsa_print (struct ccnx_opaque_lsa  *ol)
         sscanf(ol->name,"%d",&size);
         name=substring(ol->name,number_width((unsigned int)size),(unsigned int)size);
         //printf(" %s\n",name);
-        strncat(name,"\n",1);
-        writeLogg(logFile,name);
+        //strncat(name,"\n",1);
+        writeLogg(logFile, "%s\n", name);
         free(name);
 }
 

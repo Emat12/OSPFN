@@ -11,4 +11,4 @@ char * substring(const char* str, size_t begin, size_t len);
 char * lpad( unsigned int num, unsigned int padNumber);
 char * getLocalTimeStamp(void);
 char * startLogging(char *loggingDir);
-void writeLogg(const char  *file, const char *logMsg);
+void writeLogg(const char  *file, const char *format, ...);

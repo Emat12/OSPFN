@@ -5,6 +5,7 @@
 #include<string.h>
 #include<ctype.h>
 #include<stdlib.h>
+#include<stdarg.h>
 
 #include <sys/types.h>
 #include <pwd.h>
@@ -182,16 +183,23 @@ char * startLogging(char *loggingDir)
 
 }
 
-void writeLogg(const char  *file, const char *logMsg)
+void writeLogg(const char  *file, const char *format, ...)
 {
- if(file!=NULL){
-	FILE *fp=fopen(file,"a");
-		if(fp!=NULL)
-		{
-		fprintf(fp,"%s",logMsg);
-		fclose(fp);
-		}
-//	fclose(fp);
-	}
+    if (file != NULL)
+    {
+        FILE *fp = fopen(file, "a");
+
+        if (fp != NULL)
+        {
+            va_list args;
+            va_start(args, format);
+
+            vfprintf(fp, format, args);
+            fclose(fp);
+
+            va_end(args);
+        }
+        //	fclose(fp);
+    }
 }
 
