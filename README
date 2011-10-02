@@ -37,7 +37,6 @@ is in its early stage of development. Feedback and bug reports are welcome.
 Currently OSPFN v0.1.0 is distributed by the University of Memphis and the
 University of Arizona. Technical questions should be directed to 
 Cheng Yi <yic@EMAIL.ARIZONA.EDU> and A K M Mahmudul Hoque <ahoque1@memphis.edu>. 
-
 Source code can be downloaded from github by running the following:
 
 $ git clone git://github.com/NDN-Routing/OSPFN.git
@@ -71,15 +70,40 @@ CCNx v0.4.0 was used for testing and development.
 5. Installation
 ==================================
 Check out the OSPFN source code.  You should now have a directory "OSPFN". 
-The commands to install are as follows:
+
+First run configure with the following options:
+
+$ ./configure --enable-opaque-lsa --disable-ipv6 --disable-ripd --disable-ripngd --disable-ospf6d --disable-bgpd --disable-bgp-announce --sysconfdir=/usr/local/etc/quagga --localstatedir=/var/run/quagga-state
+
+Notes:
+
+(a) here we specify the quagga configuration and state file directories in 
+configure using the --sysconfdir and --localstatedir options, respectively. 
+We assume /usr/local/etc/quagga and /var/run/quagga-state are used.
+You can specify other directories.
+
+(b) the --disable options are to avoid compiling Quagga components that we 
+do not need.
+
+Now we need to create two directories: /usr/local/etc/quagga 
+and /var/run/quagga-state (or the directoryyou specified in configure).
+Both directories must be readable and writable by the user quagga and 
+group quagga.  
+
+$ cd /usr/local/etc/
+$ sudo mkdir quagga
+$ sudo chown quagga:quagga quagga
+$ sudo chmod g+w quagga
+$ cd /var/run
+$ sudo mkdir quagga-state
+$ sudo chown quagga:quagga quagga-state
+$ sudo chmod g+w quagga-state
+
+Now we can compile and install the programs.
 
 $ cd OSPFN
-$ ./configure --enable-opaque-lsa --disable-ipv6 --disable-ripd --disable-ripngd --disable-ospf6d --disable-bgpd --disable-bgp-announce
 $ make
 $ sudo make install
-
-The --disable options are to avoid compiling Quagga components that we 
-do not need.
 
 
 ==================================
@@ -117,10 +141,7 @@ ________________________  10.0.1.10  10.0.1.9 ___________________
 
 Install the GRE module:
 
-$ sudo insmod /lib/modules/`uname -r`/kernel/net/ipv4/ip_gre.ko
-
-If the command returns an error "insmod: error inserting ... -1 File exists", 
-then the module is already installed.
+$ sudo modprobe ip_gre
 
 Add the following to /etc/network/interfaces on netlogic.cs.memphis.edu:
 
@@ -187,8 +208,10 @@ installation of Quagga is needed, but you do need configure it. Instructions
 are available at http://www.quagga.net/docs.php.
 
 By default, the Quagga configuration file ospfd.conf is located at 
-/usr/local/etc/. The user should copy ospfd.conf.sample to ospfd.conf 
+/usr/local/etc/, but we have specified our own directory 
+/usr/local/etc/quagga.  The user should copy ospfd.conf.sample to ospfd.conf 
 in the same directory and modify the ospfd.conf file as necessary.
+Same for zebra.conf.
 
 A sample configuration file (ospfd.conf) for Quagga OSPF would look like 
 below for netlogic.cs.memphis.edu:
@@ -200,7 +223,7 @@ below for netlogic.cs.memphis.edu:
 hostname netlogic.cs.memphis.edu 
 password pwd
 enable password pwd 
-log file /var/log/quaggaospfd.log
+log file /var/log/quagga/ospfd.log
 !
 !
 !
@@ -235,6 +258,9 @@ permit routes to 10.0.0.0/8 networks to be advertised.
 2. Router id: we are using the public IP of each router as its router 
 ID to ensure uniqueness across the whole network.
 
+3. The log directory (/var/log/quagga in the example) must be readable 
+and writable by user quagga and group quagga.
+
 
 6.4 OSPFN Configuration
 
@@ -262,17 +288,21 @@ ccnname /ndn/memphis.edu/netlab/ 1
 ccnname /ndn/memphis.edu/cs/ 2
 logdir /var/log/ospfnlog/
 
+Note that the log directory must be readable and writable by the user
+that runs ospfn.
+
 
 ==================================
 7. Running OSPFN
 ==================================
+
 First start zebra so that ospfd can acquire needed interface information. 
 Next start ospfd and ccnd, and then start ospfn.  The commands needed are 
 shown below:
 
-$ sudo zebra -d -u root
+$ sudo zebra -d
     
-$ sudo ospfd -d -u root -a
+$ sudo ospfd -d -a
     
 $ ccndstart   
     
