@@ -4,7 +4,6 @@
 
 /* The following includes are needed in all OSPF API client
    applications. */
-
 #include <zebra.h>
 #include "prefix.h" /* needed by ospf_asbr.h */
 #include "privs.h"
@@ -19,6 +18,15 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+
+//header for ospfnstop response
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 
 #include "getopt.h"
@@ -343,8 +351,8 @@ int readConfigFile(char *filename, int isLogOnlyProcessing)
             buf[len-1]='\0';		
         //printf("\n%s",buf);
        // printf("\n");
-       writeLogg(logFile,buf);
-       writeLogg(logFile,"\n"); 
+       writeLogg(logFile,"%s\n",buf);
+       //writeLogg(logFile,"\n"); 
        process_conf_command(buf,isLogOnlyProcessing);	
     }
 
@@ -442,8 +450,9 @@ static int lsa_read (struct thread *thread)
     }
 
     /* Reschedule read thread */
+    thread_add_timer (master, ospfnstop, oclient,1); 
     thread_add_read (master, lsa_read, oclient, fd);
-
+    //thread_add_timer (master, ospfnstop, oclient,1);
     return 0;
 }
 
@@ -655,7 +664,7 @@ int inject_adjacency_opaque_lsa (struct thread *t)
     else
     {
         //printf("\n CCN Neighbors in the List :\n");
-        writeLogg(logFile,"CCN Neighborrs List is Empty\n");
+        writeLogg(logFile,"CCN Neighborrs List is: \n");
         while(current_neighbor!= NULL)
         {
             sprintf(buff,"%s|%d|",inet_ntoa(current_neighbor->address),current_neighbor->path_cost);
@@ -668,14 +677,14 @@ int inject_adjacency_opaque_lsa (struct thread *t)
     }
     sprintf(tmp_data,"%d|%s",count,data);
     strcpy(tmp_data,align_data(tmp_data));
-    writeLogg(logFile,tmp_data);
+    writeLogg(logFile,"%s\n",tmp_data);
     //printf("%s\n",tmp_data);
     opaquelen=strlen(tmp_data);
     opaquedata=&tmp_data;
 
     //printf ("Originating/updating  Adj LSA with counter=%d... ", counter);
     char logMsg[60];
-    sprintf (logMsg,"\nOriginating/updating  Adj LSA with counter=%d... ", counter);
+    sprintf (logMsg,"Originating/updating  Adj LSA with counter=%d... ", counter);
     writeLogg(logFile,logMsg);
     rc = ospf_apiclient_lsa_originate(cl, ifaddr, area_id,
             lsa_type,
@@ -728,7 +737,7 @@ void inject_name_opaque_lsa(struct name_prefix *np, unsigned int op_id )
     writeLogg(logFile,logMsg);
     opaquelen=strlen(lsa_names);
     //printf ("Originating/updating LSA with counter=%d... ", counter);
-    sprintf (logMsg,"Originating/updating LSA with counter=%d... ", counter);
+    sprintf (logMsg,"Originating/updating LSA with counter=%d... \n", counter);
     writeLogg(logFile,logMsg);
     rc = ospf_apiclient_lsa_originate(cl, ifaddr, area_id,
             lsa_type,
@@ -744,7 +753,51 @@ void inject_name_opaque_lsa(struct name_prefix *np, unsigned int op_id )
 
 
 }
+/*----------------------------------------------------------*/
+/*                     OSPFNSTOP RESPONSE                   */
+/*----------------------------------------------------------*/
 
+int ospfnstop(struct thread *t){
+
+	//printf("Ospfnstop called\n");
+        //writeLogg(logFile,"ospfnstop called\n");
+        int sockfd;
+    	int len ;
+    	struct sockaddr_in address;
+    	int result;
+    	//char signal;
+ 
+	   //Create socket for client.
+    	sockfd = socket(PF_INET, SOCK_STREAM, 0);
+    	if (sockfd == -1) { 
+       		//writeLogg(logFile,"Socket create failed.\n") ; 
+        	return -1 ; 
+    	} 
+     
+    	//Name the socket as agreed with server.
+    	address.sin_family = AF_INET;
+    	address.sin_addr.s_addr = inet_addr("127.0.0.1");
+    	address.sin_port = htons(8888);
+    	len = sizeof(address);
+ 
+    	result = connect(sockfd, (struct sockaddr *)&address, len);
+    	if(result == -1)
+    	{
+        	//writeLogg(logFile,"Error has occurred\n");
+    	}
+    	else{ 
+       		writeLogg(logFile,"Signal from ospfnstop\n"); 
+	        //read(sockfd, &signal, 1); 
+	        //if(signal == '1'){	
+			hash_iterate_delete_npt (prefix_table);	
+       	        	close(sockfd);	
+                	exit(0);
+		//} 
+	}	
+    	close(sockfd);
+ 
+    	return 0;
+}
 
 
 /* ---------------------------------------------------------
@@ -793,7 +846,7 @@ int main(int argc, char *argv[])
     if(isLoggingEnabled)
      logFile=startLogging( loggingDir );
 
-	
+    //printf("main:%s\n",logFile);	
     
     ccn_handle = ccn_create();
     res = ccn_connect(ccn_handle, NULL); 
@@ -812,7 +865,7 @@ int main(int argc, char *argv[])
         writeLogg(logFile, "Connecting to OSPF daemon on host: 127.0.0.1 failed!!\n");
         exit (1);
     }
-    else writeLogg(logFile,"\nConnection to OSPF established. \n");
+    else writeLogg(logFile,"Connection to OSPF established. \n");
 
     /* Register callback functions. */
     ospf_apiclient_register_callback (oclient,

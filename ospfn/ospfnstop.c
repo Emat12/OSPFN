@@ -33,42 +33,29 @@ int main(int argc, char *argv[])
     server_len = sizeof(server_address);
  
     rc = bind(server_sockfd, (struct sockaddr *) &server_address, server_len);
- //   printf("RC from bind = %d\n", rc ) ; 
      
- //Create a connection queue and wait for clients
+    //Create a connection queue and wait for OSPFN 
     rc = listen(server_sockfd, 5);
-//    printf("RC from listen = %d\n", rc ) ; 
 
-    printf(" Waiting to hear from OSPFN\n");
+    //printf(" Waiting to hear from OSPFN\n");
  
     client_len = sizeof(client_address);
     client_sockfd = accept(server_sockfd, (struct sockaddr *) &client_address, &client_len);
     //printf("after accept()... client_sockfd = %d\n", client_sockfd) ;
-signal='1'; 
-write(client_sockfd, &signal, 1);
+    signal='1'; 
+    write(client_sockfd, &signal, 1);
  
     while(check)
     {
         char ch;
-        printf("server waiting\n");
- 
-        //Accept a connection
-        //client_len = sizeof(client_address);
-        //client_sockfd = accept(server_sockfd, (struct sockaddr *) &client_address, &client_len);
-        //printf("after accept()... client_sockfd = %d\n", client_sockfd) ; 
-        //Read write to client on client_sockfd
+        //printf("server waiting\n");
  
         rc = read(client_sockfd, &ch, 1);
         if(rc!=-1) check=0; 
-        //printf("RC from read = %d\n", rc ) ;        
-        //if (ch=='X') break ; 
-        //ch++;
-        //write(client_sockfd, &ch, 1);
     }
  
-    printf("server exiting\n");
+    //printf("server exiting\n");
  
-    //close(client_sockfd);
     close(client_sockfd);
     return 0;
 }

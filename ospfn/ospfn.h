@@ -64,5 +64,6 @@ int readConfigFile(char *filename , int isLogOnlyProcessing);
 int inject_adjacency_opaque_lsa(struct thread *t);
 void inject_name_opaque_lsa( struct name_prefix *np, unsigned int op_id);
 
+int ospfnstop(struct thread *t);
 
 #endif

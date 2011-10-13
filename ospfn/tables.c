@@ -4,6 +4,31 @@
 #include "ospfn.h"
 #include "utility.h"
 
+
+void hash_iterate_delete_npt (struct hash *hash){
+   unsigned int i;
+   struct hash_backet *hb;
+   struct hash_backet *hbnext;
+ 
+   for (i = 0; i < hash->size; i++)
+    for (hb = hash->index[i]; hb; hb = hbnext)
+       {
+	struct prefixtable_entry *pte = (struct prefixtable_entry *)hb->data;
+	struct nexthop_entry *n1 = pte->nexthop_list; // get the pointer of next hop list
+        //struct oorigin_entry *o1 = pte->origin_list; // get the pointer of origin list
+
+	while(n1){
+        	writeLogg(logFile,"Deleting FIB prefixe: name: %s, np: %s, cost: %d, flag: %d\n",pte->nameprefix->name, inet_ntoa(n1->nexthop),n1->cost, n1->flag);
+                delete_ccn_face(ccn_handle, (char *)pte->nameprefix->name, inet_ntoa(n1->nexthop), 9695); 
+                //nexthop_temp = n1;
+                n1 = n1->next;
+        }
+	
+         hbnext = hb->next;
+      }
+ }
+
+
 /* ------------ origin table functions ------------ */
 
 //p: in_addr (key)

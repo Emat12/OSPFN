@@ -62,6 +62,7 @@ struct origintable_entry
     struct nexthop_entry *nexthop_list;
 };
 
+void hash_iterate_delete_npt (struct hash *hash);
 extern struct hash *origin_hash_create(void);
 extern struct origintable_entry *origin_hash_get(struct hash *hash, struct in_addr *router_id);
 extern void update_origin_nexthop_list(struct origintable_entry *oe, int nexthop_count, struct in_addr *nexthops);
