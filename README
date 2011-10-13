@@ -16,7 +16,8 @@ on Quagga.  This manual covers OSPFN v0.1.0.
 7. Running
 8. Checking OSPFN
 9. OSPFN Log
-10. Contributors
+10. Stopping ospfn
+11. Contributors
 
 
 
@@ -368,7 +369,19 @@ directory and write the log files there.
 
 
 ==================================
-10. Contributors
+10. Stopping ospfn 
+==================================
+
+For stopping ospfn type ospfnstop in terminal.
+
+$ospfnstop
+
+ospfnstop will take a while to get response from ospfn and delete all the
+fib entries by ospfn. After deleting the fib entries ospfn will stop and
+ospfnstop will exit itself. 
+
+==================================
+11. Contributors
 ==================================
 
 Implementation and Testing: Cheng Yi (U. Arizona), 
