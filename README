@@ -151,7 +151,7 @@ address 10.0.1.10
 netmask 255.255.255.252
 pre-up iptunnel add netlogictohobo mode gre local 141.225.11.150 remote 150.135.82.77 ttl 255 
 pointopoint 10.0.1.9
-up ifconfig netlogictohobo
+up ifconfig netlogictohobo multicast
 
 Note that "netlogictohobo" is the name that you give to the tunnel interface.
 
@@ -163,7 +163,7 @@ address 10.0.1.9
 netmask 255.255.255.252
 pre-up iptunnel add hobotonetlogic mode gre local 150.135.82.77 remote 141.225.11.150 ttl 255 
 pointopoint 10.0.1.10
-up ifconfig hobotonetlogic
+up ifconfig hobotonetlogic multicast
 
 Restart networking:
 $ sudo /etc/init.d/networking restart
