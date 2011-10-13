@@ -18,7 +18,7 @@ void hash_iterate_delete_npt (struct hash *hash){
         //struct oorigin_entry *o1 = pte->origin_list; // get the pointer of origin list
 
 	while(n1){
-        	writeLogg(logFile,"Deleting FIB prefixe: name: %s, np: %s, cost: %d, flag: %d\n",pte->nameprefix->name, inet_ntoa(n1->nexthop),n1->cost, n1->flag);
+        	writeLogg(logFile,"Deleting FIB prefix: Name: %s, Next Hop: %s, cost: %d, flag: %d\n",pte->nameprefix->name, inet_ntoa(n1->nexthop),n1->cost, n1->flag);
                 delete_ccn_face(ccn_handle, (char *)pte->nameprefix->name, inet_ntoa(n1->nexthop), 9695); 
                 //nexthop_temp = n1;
                 n1 = n1->next;
