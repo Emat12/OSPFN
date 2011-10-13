@@ -13,6 +13,7 @@ libtool
 ospfclient/ospfclient
 ospfd/ospfd
 ospfn/ospfn
+ospfn/ospfnstop
 pkgsrc/bgpd.sh
 pkgsrc/ospf6d.sh
 pkgsrc/ospfd.sh
