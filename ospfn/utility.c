@@ -86,34 +86,31 @@ char* substring(const char* str, size_t begin, size_t len)
 char * lpad( unsigned int num, unsigned int padNumber)
 {
 
- 	char *result=malloc(padNumber);
-	while(padNumber>0)
+ 	char *result=malloc(padNumber+1);
+        int len=padNumber;	
+        while(padNumber>0)
 	{
 		result[padNumber-1]=(char)(num%10)+48;		
 		num=num/10;
 		padNumber--;
 	}	
-	
+        result[len]='\0';	
 	return result;
 }
 
 
 char * getLocalTimeStamp(void)
 {
-	char *timeStamp=malloc(16);
-        time_t ltime;
+	char *timestamp = (char *)malloc(sizeof(char) * 16);
+	time_t ltime;
 	ltime=time(NULL);
-	struct tm *Tm;
-	Tm=localtime(&ltime);
-	timeStamp=strndup(lpad(1900+Tm->tm_year,4),4);
-	strncat(timeStamp,lpad(Tm->tm_mon+1,2),2);
-	strncat(timeStamp,lpad(Tm->tm_mday,2),2);
-	strncat(timeStamp,lpad(Tm->tm_hour,2),2);
-	strncat(timeStamp,lpad(Tm->tm_min,2),2);
-	strncat(timeStamp,lpad(Tm->tm_sec,2),2);	
+	struct tm *tm;
+	tm=localtime(&ltime);
+  
+	sprintf(timestamp, "%04d%02d%02d%02d%02d%02d", tm->tm_year+1900, tm->tm_mon, 
+		tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
 
-	return timeStamp;
-
+	return timestamp;
 }
 
 char * startLogging(char *loggingDir)
@@ -177,7 +174,8 @@ char * startLogging(char *loggingDir)
 	//printf(" lf: %s \n",logFileName);
         ret=(char *)malloc(strlen(logFileName));
         ret=strndup(logFileName,strlen(logFileName));	
-	return ret;	
+       //printf("%s\n",ret); 
+        return ret;	
    			
 
 
@@ -187,10 +185,14 @@ void writeLogg(const char  *file, const char *format, ...)
 {
     if (file != NULL)
     {
+        //printf("%s\n",file); 
         FILE *fp = fopen(file, "a");
 
         if (fp != NULL)
         {
+            
+            char *time=getLocalTimeStamp();
+	    fprintf(fp,"%s:",time);        
             va_list args;
             va_start(args, format);
 
@@ -199,7 +201,6 @@ void writeLogg(const char  *file, const char *format, ...)
 
             va_end(args);
         }
-        //	fclose(fp);
     }
 }
 
