@@ -760,7 +760,7 @@ void inject_name_opaque_lsa(struct name_prefix *np, unsigned int op_id )
 int ospfnstop(struct thread *t){
 
 	//printf("Ospfnstop called\n");
-        //writeLogg(logFile,"ospfnstop called\n");
+
         int sockfd;
     	int len ;
     	struct sockaddr_in address;
@@ -770,7 +770,7 @@ int ospfnstop(struct thread *t){
 	   //Create socket for client.
     	sockfd = socket(PF_INET, SOCK_STREAM, 0);
     	if (sockfd == -1) { 
-       		//writeLogg(logFile,"Socket create failed.\n") ; 
+       		//perror("Socket create failed.\n") ; 
         	return -1 ; 
     	} 
      
@@ -783,7 +783,7 @@ int ospfnstop(struct thread *t){
     	result = connect(sockfd, (struct sockaddr *)&address, len);
     	if(result == -1)
     	{
-        	//writeLogg(logFile,"Error has occurred\n");
+        	//perror("Error has occurred");
     	}
     	else{ 
        		writeLogg(logFile,"Signal from ospfnstop\n"); 
