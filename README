@@ -380,6 +380,8 @@ ospfnstop will take a while to get response from ospfn and delete all the
 fib entries by ospfn. After deleting the fib entries ospfn will stop and
 ospfnstop will exit itself. 
 
+A precautious measure is to always restart all 4 daemons: zebra, ospfd, ccnd, ospfn.
+
 ==================================
 11. Contributors
 ==================================
