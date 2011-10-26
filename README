@@ -17,7 +17,8 @@ on Quagga.  This manual covers OSPFN v0.1.0.
 8. Checking OSPFN
 9. OSPFN Log
 10. Stopping ospfn
-11. Contributors
+11. Stopping ccnd, zebra, ospfd
+12. Contributors
 
 
 
@@ -381,6 +382,35 @@ fib entries by ospfn. After deleting the fib entries ospfn will stop and
 ospfnstop will exit itself. 
 
 A precautious measure is to always restart all 4 daemons: zebra, ospfd, ccnd, ospfn.
+
+==================================
+10. Stopping ccnd, zebra, ospfd 
+==================================
+
+Stopping ccnd: stop ccnd by typping into terminal 
+ $ccndstop
+
+Stopping zebra: Kill zebra process by finding its process id, One can find process id 
+by typing into terminal 
+ $ ps -eaf | grep zebra
+
+Then you will find result like below 
+
+quagga    2786     1  0 Oct09 ?        00:00:00 zebra -d
+
+After that type into terminal
+ $kill 2786
+
+Stopping ospfd: Kill zebra process by finding its process id, One can find process id 
+by typing into terminal 
+ $ ps -eaf | grep ospfd
+
+Then you will find result like below 
+
+quagga    2788     1  0 Oct09 ?        00:00:00 ospfd -d -a
+
+After that type into terminal
+ $kill 2788
 
 ==================================
 11. Contributors
