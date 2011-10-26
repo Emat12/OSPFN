@@ -384,7 +384,7 @@ ospfnstop will exit itself.
 A precautious measure is to always restart all 4 daemons: zebra, ospfd, ccnd, ospfn.
 
 ==================================
-10. Stopping ccnd, zebra, ospfd 
+11. Stopping ccnd, zebra, ospfd 
 ==================================
 
 Stopping ccnd: stop ccnd by typping into terminal 
