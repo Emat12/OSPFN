@@ -473,9 +473,9 @@ static void lsa_update_callback (struct in_addr ifaddr, struct in_addr area_id,
     char logMsg[25];
     writeLogg(logFile,"lsa_update_callback: ");
     sprintf (logMsg,"ifaddr: %s ", inet_ntoa (ifaddr));
-    writeLogg(logFile,logMsg);
+    writeLogg(logFile,"\n%s",logMsg);
     sprintf (logMsg,"area: %s\n", inet_ntoa (area_id));
-    writeLogg(logFile,logMsg);
+    writeLogg(logFile,"\n%s",logMsg);
     sprintf (logMsg,"is_self_origin: %u\n", is_self_originated);
     writeLogg(logFile, logMsg); 
 	/* It is important to note that lsa_header does indeed include the
