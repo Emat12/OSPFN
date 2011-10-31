@@ -782,11 +782,8 @@ int get_ospfnstop_sock(void){
 	int reuse_addr = 1;  /* Used so we can re-bind to our port
 				while a previous connection is still
 				in TIME_WAIT state. */
-	
-	
 	int sock;            /* The socket file descriptor for our "listening"
                    	socket */
-
 	/* Obtain a file descriptor for our "listening" socket */
 	sock = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (sock < 0) {
@@ -807,10 +804,8 @@ int get_ospfnstop_sock(void){
 	unlink(server_address.sun_path);
 	if (bind(sock, (struct sockaddr *) &server_address,
 	  sizeof(server_address)) < 0 ) {
-		//perror("bind");
 		close(sock);
 	  	return 0;	
-		//exit(EXIT_FAILURE);
 	}
 
 	/* Set up queue for incoming connections. */
@@ -822,48 +817,15 @@ int ospfnstop(struct thread *t){
 
 	printf("ospfnstop called: %4d\n",scount);
 	writeLogg(logFile,"ospfnstop called: %4d\n",scount++);	
-	fd_set socks;        /* Socket file descriptors we want to wake
-					up for, using select() */
-	struct timeval timeout;  /* Timeout for select */
-	int readsocks;	     /* Number of sockets ready for reading */
+	fd_set socks;      
+	struct timeval timeout;  
+	int readsocks;	     
 
-	/* FD_ZERO() clears out the fd_set called socks, so that
-		it doesn't contain any file descriptors. */
 	FD_ZERO(&socks);
-	/* FD_SET() adds the file descriptor "sock" to the fd_set,
-		so that select() will return if a connection comes in
-		on that socket (which means you have to do accept(), etc. */
 	FD_SET(ospfnstop_sock,&socks);
 	timeout.tv_sec = 1;
 	timeout.tv_usec = 0;
 		
-		/* The first argument to select is the highest file
-			descriptor value plus 1. In most cases, you can
-			just pass FD_SETSIZE and you'll be fine. */
-			
-		/* The second argument to select() is the address of
-			the fd_set that contains sockets we're waiting
-			to be readable (including the listening socket). */
-			
-		/* The third parameter is an fd_set that you want to
-			know if you can write on -- this example doesn't
-			use it, so it passes 0, or NULL. The fourth parameter
-			is sockets you're waiting for out-of-band data for,
-			which usually, you're not. */
-		
-		/* The last parameter to select() is a time-out of how
-			long select() should block. If you want to wait forever
-			until something happens on a socket, you'll probably
-			want to pass NULL. */
-		
-		/* select() returns the number of sockets that had
-			things going on with them -- i.e. they're readable. */
-			
-		/* Once select() returns, the original fd_set has been
-			modified so it now reflects the state of why select()
-			woke up. i.e. If file descriptor 4 was originally in
-			the fd_set, and then it became readable, the fd_set
-			contains file descriptor 4 in it. */
 	readsocks=select(ospfnstop_sock+1, &socks, (fd_set *) 0, (fd_set *) 0, &timeout);
 	if (readsocks > 0){
 		//printf("x\n");
