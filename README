@@ -412,8 +412,11 @@ quagga    2788     1  0 Oct09 ?        00:00:00 ospfd -d -a
 After that type into terminal
  $kill 2788
 
+Stopping ccnd: Run ccndstop from terminal to stop ccnd
+ $ccndstop
+
 ==================================
-11. Contributors
+12. Contributors
 ==================================
 
 Implementation and Testing: Cheng Yi (U. Arizona), 
