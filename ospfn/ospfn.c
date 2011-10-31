@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 
 //header for ospfnstop response
 #ifdef HAVE_CONFIG_H
@@ -27,7 +28,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-
+#include <fcntl.h>
+#include <netdb.h>
+#include <sys/un.h>
 
 #include "getopt.h"
 #include "ospfd/ospfd.h"
@@ -47,6 +50,7 @@
 #include <ccn/ccn.h>
 
 static u_int32_t counter = 1;
+static u_int32_t scount = 1;
 static int opaque_id=1;
 
 static int CCN_MAX_NEXT_HOPS=2;
@@ -450,9 +454,7 @@ static int lsa_read (struct thread *thread)
     }
 
     /* Reschedule read thread */
-    thread_add_timer (master, ospfnstop, oclient,1); 
     thread_add_read (master, lsa_read, oclient, fd);
-    //thread_add_timer (master, ospfnstop, oclient,1);
     return 0;
 }
 
@@ -757,46 +759,123 @@ void inject_name_opaque_lsa(struct name_prefix *np, unsigned int op_id )
 /*                     OSPFNSTOP RESPONSE                   */
 /*----------------------------------------------------------*/
 
+void setnonblocking(int sock)
+{
+	int opts;
+
+	opts = fcntl(sock,F_GETFL);
+	if (opts < 0) {
+		perror("fcntl(F_GETFL)");
+		exit(1);
+	}
+	opts = (opts | O_NONBLOCK);
+	if (fcntl(sock,F_SETFL,opts) < 0) {
+		perror("fcntl(F_SETFL)");
+		exit(1);
+	}
+	return;
+}
+
+int get_ospfnstop_sock(void){
+
+	struct sockaddr_un server_address; /* bind info structure */
+	int reuse_addr = 1;  /* Used so we can re-bind to our port
+				while a previous connection is still
+				in TIME_WAIT state. */
+	
+	
+	int sock;            /* The socket file descriptor for our "listening"
+                   	socket */
+
+	/* Obtain a file descriptor for our "listening" socket */
+	sock = socket(AF_UNIX, SOCK_STREAM, 0);
+	if (sock < 0) {
+		perror("socket");
+	 	return 0;	
+		//exit(EXIT_FAILURE);
+	}
+	/* So that we can re-bind to it without TIME_WAIT problems */
+	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &reuse_addr,
+		sizeof(reuse_addr));
+
+	/* Set socket to non-blocking with our setnonblocking routine */
+	setnonblocking(sock);
+
+	memset((char *) &server_address, 0, sizeof(server_address));
+	server_address.sun_family = AF_UNIX;
+	strcpy(server_address.sun_path,"/tmp/ospfn.sock");
+	unlink(server_address.sun_path);
+	if (bind(sock, (struct sockaddr *) &server_address,
+	  sizeof(server_address)) < 0 ) {
+		//perror("bind");
+		close(sock);
+	  	return 0;	
+		//exit(EXIT_FAILURE);
+	}
+
+	/* Set up queue for incoming connections. */
+	listen(sock,1);
+	return sock;
+}
+
 int ospfnstop(struct thread *t){
 
-	//printf("Ospfnstop called\n");
+	printf("ospfnstop called: %4d\n",scount);
+	writeLogg(logFile,"ospfnstop called: %4d\n",scount++);	
+	fd_set socks;        /* Socket file descriptors we want to wake
+					up for, using select() */
+	struct timeval timeout;  /* Timeout for select */
+	int readsocks;	     /* Number of sockets ready for reading */
 
-        int sockfd;
-    	int len ;
-    	struct sockaddr_in address;
-    	int result;
-    	//char signal;
- 
-	   //Create socket for client.
-    	sockfd = socket(PF_INET, SOCK_STREAM, 0);
-    	if (sockfd == -1) { 
-       		//perror("Socket create failed.\n") ; 
-        	return -1 ; 
-    	} 
-     
-    	//Name the socket as agreed with server.
-    	address.sin_family = AF_INET;
-    	address.sin_addr.s_addr = inet_addr("127.0.0.1");
-    	address.sin_port = htons(8888);
-    	len = sizeof(address);
- 
-    	result = connect(sockfd, (struct sockaddr *)&address, len);
-    	if(result == -1)
-    	{
-        	//perror("Error has occurred");
-    	}
-    	else{ 
-       		writeLogg(logFile,"Signal from ospfnstop\n"); 
-	        //read(sockfd, &signal, 1); 
-	        //if(signal == '1'){	
-			hash_iterate_delete_npt (prefix_table);	
-       	        	close(sockfd);	
-                	exit(0);
-		//} 
-	}	
-    	close(sockfd);
- 
-    	return 0;
+	/* FD_ZERO() clears out the fd_set called socks, so that
+		it doesn't contain any file descriptors. */
+	FD_ZERO(&socks);
+	/* FD_SET() adds the file descriptor "sock" to the fd_set,
+		so that select() will return if a connection comes in
+		on that socket (which means you have to do accept(), etc. */
+	FD_SET(ospfnstop_sock,&socks);
+	timeout.tv_sec = 1;
+	timeout.tv_usec = 0;
+		
+		/* The first argument to select is the highest file
+			descriptor value plus 1. In most cases, you can
+			just pass FD_SETSIZE and you'll be fine. */
+			
+		/* The second argument to select() is the address of
+			the fd_set that contains sockets we're waiting
+			to be readable (including the listening socket). */
+			
+		/* The third parameter is an fd_set that you want to
+			know if you can write on -- this example doesn't
+			use it, so it passes 0, or NULL. The fourth parameter
+			is sockets you're waiting for out-of-band data for,
+			which usually, you're not. */
+		
+		/* The last parameter to select() is a time-out of how
+			long select() should block. If you want to wait forever
+			until something happens on a socket, you'll probably
+			want to pass NULL. */
+		
+		/* select() returns the number of sockets that had
+			things going on with them -- i.e. they're readable. */
+			
+		/* Once select() returns, the original fd_set has been
+			modified so it now reflects the state of why select()
+			woke up. i.e. If file descriptor 4 was originally in
+			the fd_set, and then it became readable, the fd_set
+			contains file descriptor 4 in it. */
+	readsocks=select(ospfnstop_sock+1, &socks, (fd_set *) 0, (fd_set *) 0, &timeout);
+	if (readsocks > 0){
+		//printf("x\n");
+	 	writeLogg(logFile,"Signal from ospfnstop\n");
+		hash_iterate_delete_npt (prefix_table);	
+		close(ospfnstop_sock);
+		remove("/tmp/ospfn.sock");	
+		exit(0);
+	}
+
+	thread_add_timer (master, ospfnstop, oclient,5);	
+	return 0;
 }
 
 
@@ -838,8 +917,8 @@ int main(int argc, char *argv[])
 
     origin_table = origin_hash_create();
     prefix_table = prefix_hash_create();
-
-   readConfigFile(config_file,1);
+    ospfnstop_sock=get_ospfnstop_sock();
+    readConfigFile(config_file,1);
 
   // printf("%s from main\n",loggingDir);
  
@@ -890,13 +969,9 @@ int main(int argc, char *argv[])
     //insert code here for processing neighbors and ccnnames and call them 
     process_adjacent();
 
-    //insert code here for routing table claculation
-//    calculate_route();
-
-    //insert code here for FIB manipulation
-//    manipulate_fib();	
-
+    thread_add_timer (master, ospfnstop, oclient,5);
     thread_add_read (master, lsa_read, oclient, oclient->fd_async);
+    //thread_add_timer (master, ospfnstop, oclient,5);
 
     if (daemon_mode)
         daemon(0, 0);

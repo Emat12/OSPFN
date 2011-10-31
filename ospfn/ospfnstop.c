@@ -1,61 +1,40 @@
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
- 
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+#include <sys/un.h>
 #include <unistd.h>
 
-int main(int argc, char *argv[])
+#define SOCK_PATH "/tmp/ospfn.sock"
+
+int main(void)
 {
-    //Declaring process variables.
-    int server_sockfd, client_sockfd;
-    int server_len ; 
-    int rc ;
-    int check=1; 
-    unsigned client_len;
-    struct sockaddr_in server_address;
-    struct sockaddr_in client_address;
-    char signal; 
+    int s, len;
+    struct sockaddr_un remote;
 
-
- 
-    //Remove any old socket and create an unnamed socket for the server.
-    server_sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    server_address.sin_family = AF_INET;
-    server_address.sin_addr.s_addr = htons(INADDR_ANY);
-    server_address.sin_port = htons(8888) ; 
-    server_len = sizeof(server_address);
- 
-    rc = bind(server_sockfd, (struct sockaddr *) &server_address, server_len);
-     
-    //Create a connection queue and wait for OSPFN 
-    rc = listen(server_sockfd, 5);
-
-    //printf(" Waiting to hear from OSPFN\n");
- 
-    client_len = sizeof(client_address);
-    client_sockfd = accept(server_sockfd, (struct sockaddr *) &client_address, &client_len);
-    //printf("after accept()... client_sockfd = %d\n", client_sockfd) ;
-    signal='1'; 
-    write(client_sockfd, &signal, 1);
- 
-    while(check)
-    {
-        char ch;
-        //printf("server waiting\n");
- 
-        rc = read(client_sockfd, &ch, 1);
-        if(rc!=-1) check=0; 
+    if ((s = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
+        //perror("socket");
+        exit(1);
     }
- 
-    //printf("server exiting\n");
- 
-    close(client_sockfd);
+
+    //printf("Trying to connect...\n");
+
+    remote.sun_family = AF_UNIX;
+    strcpy(remote.sun_path, SOCK_PATH);
+    //len = strlen(remote.sun_path) + sizeof(remote.sun_family);
+    len=sizeof(remote);
+    if (connect(s, (struct sockaddr *)&remote, len) == -1) {
+        //perror("connect");
+        printf("Either no ospfn process running or connection refused\n"); 
+	exit(1);
+    }
+
+    //printf("Connected.\n");
+    len=write(s," ",1);
+    //printf("WRITE %d\n",wlen);
+    close(s);
     return 0;
 }
+

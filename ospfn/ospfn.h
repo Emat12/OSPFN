@@ -43,7 +43,7 @@ struct hash *origin_table;
 
 char  *logFile;
 char  *loggDir;
-
+int ospfnstop_sock;
 //----------Data Structure Added for ospfn -------
 //data structures 
 
@@ -65,5 +65,6 @@ int inject_adjacency_opaque_lsa(struct thread *t);
 void inject_name_opaque_lsa( struct name_prefix *np, unsigned int op_id);
 
 int ospfnstop(struct thread *t);
-
+int get_ospfnstop_sock(void);
+void setnonblocking(int sock);
 #endif
