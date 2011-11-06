@@ -7,7 +7,7 @@
 #include <sys/un.h>
 #include <unistd.h>
 
-#define SOCK_PATH "/tmp/ospfn.sock"
+//#define SOCK_PATH "/tmp/ospfn.sock"
 
 int main(void)
 {
@@ -22,8 +22,7 @@ int main(void)
     //printf("Trying to connect...\n");
 
     remote.sun_family = AF_UNIX;
-    strcpy(remote.sun_path, SOCK_PATH);
-    //len = strlen(remote.sun_path) + sizeof(remote.sun_family);
+    strcpy(remote.sun_path, "/tmp/ospfn.sock");
     len=sizeof(remote);
     if (connect(s, (struct sockaddr *)&remote, len) == -1) {
         //perror("connect");
