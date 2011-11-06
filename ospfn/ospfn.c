@@ -57,6 +57,7 @@ static int CCN_MAX_NEXT_HOPS=2;
 static char OSPFN_DEFAULT_CONFIG_FILE[] = "ospfn.conf";
 static char OSPFN_LOCAL_HOST[] = "127.0.0.1";
 char *loggingDir;
+
 /* privileges struct. 
  * set cap_num_* and uid/gid to nothing to use NULL privs
  * as ospfapiclient links in libospf.a which uses privs.
@@ -517,8 +518,8 @@ static void lsa_delete_callback (struct in_addr ifaddr, struct in_addr area_id,
     //printf ("is_self_origin: %u\n", is_self_originated);
     
     char logMsg[25];
-    writeLogg(logFile,"lsa_delete_callback: ");
-    sprintf (logMsg,"ifaddr: %s ", inet_ntoa (ifaddr));
+    writeLogg(logFile,"lsa_delete_callback: \n");
+    sprintf (logMsg,"ifaddr: %s \n", inet_ntoa (ifaddr));
     writeLogg(logFile,logMsg);
     sprintf (logMsg,"area: %s\n", inet_ntoa (area_id));
     writeLogg(logFile,logMsg);
@@ -929,7 +930,7 @@ int main(int argc, char *argv[])
     readConfigFile(config_file,0);	
 
     //insert code here for processing neighbors and ccnnames and call them 
-    process_adjacent();
+    //process_adjacent();
 
     thread_add_timer (master, ospfnstop, oclient,5);
     thread_add_read (master, lsa_read, oclient, oclient->fd_async);
