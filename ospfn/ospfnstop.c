@@ -6,34 +6,19 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
-
-//#define SOCK_PATH "/tmp/ospfn.sock"
+#include <signal.h>
 
 int main(void)
 {
-    int s, len;
-    struct sockaddr_un remote;
-
-    if ((s = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
-        //perror("socket");
-        exit(1);
-    }
-
-    //printf("Trying to connect...\n");
-
-    remote.sun_family = AF_UNIX;
-    strcpy(remote.sun_path, "/tmp/ospfn.sock");
-    len=sizeof(remote);
-    if (connect(s, (struct sockaddr *)&remote, len) == -1) {
-        //perror("connect");
-        printf("Either no ospfn process running or connection refused\n"); 
-	exit(1);
-    }
-
-    //printf("Connected.\n");
-    len=write(s," ",1);
-    //printf("WRITE %d\n",wlen);
-    close(s);
-    return 0;
+	FILE *fp;
+	fp=fopen("/var/run/quagga-state/ospfn.pid","r");
+	if(fp!=NULL){
+		int pid;
+		fscanf(fp,"%d",&pid);
+		kill(pid,SIGTERM);
+	}
+	else{
+		perror("ospfnstop is not running or user does not have permission to pid file\n");	
+	}
 }
 

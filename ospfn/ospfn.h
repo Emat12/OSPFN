@@ -69,6 +69,7 @@ void inject_name_opaque_lsa( struct name_prefix *np, unsigned int op_id);
 
 void init(void);
 void ospfn_stop_signal_handler(int sig);
+void pid_create(pid_t pid);
 
 //int ospfnstop(struct thread *t);
 //int get_ospfnstop_sock(void);

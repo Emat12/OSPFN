@@ -96,6 +96,7 @@ struct ccn_neighbors *neighbors=NULL;
 void init(void){
 	counter=0;
 	opaque_id=1;
+ 	//pid_create();	
 	if (signal(SIGQUIT, ospfn_stop_signal_handler ) == SIG_ERR) {
           perror("SIGQUIT install error\n");
           exit(1);
@@ -104,6 +105,7 @@ void init(void){
           perror("SIGTERM install error\n");
           exit(1);
         }
+
 }
 
 void ospfn_stop_signal_handler(int sig){
@@ -112,6 +114,21 @@ void ospfn_stop_signal_handler(int sig){
         hash_iterate_delete_npt (prefix_table);
 	writeLogg(logFile,"Exiting ospfn...\n");	
 	exit(0);
+}
+
+void pid_create(pid_t pid){
+	FILE *fp;
+	fp=fopen("/var/run/quagga-state/ospfn.pid","w");
+	if(fp!=NULL){
+		//pid_t pid=getpid();
+		//printf("%d\n",pid);	
+		fprintf(fp,"%d\n",pid+1);
+		fclose(fp);	
+	}
+	else{
+	 	perror("pid create: can not create pid file /var/run/quagga-state/ospfn.pid\n");
+	 	exit(1);
+	}	
 }
 
 //functions for processing ccn_neighbors list
@@ -868,11 +885,8 @@ int main(int argc, char *argv[])
     int isLoggingEnabled = 1;
     char *config_file = OSPFN_DEFAULT_CONFIG_FILE;
 
-    if (signal(SIGQUIT, ospfn_stop_signal_handler ) == SIG_ERR) {
-          perror("SIGQUIT install error\n");
-          exit(1);
-        }
 
+    
     while ((res = getopt_long(argc, argv, "df:hn", longopts, 0)) != -1) {
         switch (res) {
             case 'd':
@@ -897,7 +911,8 @@ int main(int argc, char *argv[])
     origin_table = origin_hash_create();
     prefix_table = prefix_hash_create();
     init(); 
-    //ospfnstop_sock=get_ospfnstop_sock();
+    pid_create(getpid()); 
+	//ospfnstop_sock=get_ospfnstop_sock();
     readConfigFile(config_file,1);
 
   // printf("%s from main\n",loggingDir);
