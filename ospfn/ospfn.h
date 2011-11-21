@@ -41,6 +41,9 @@ struct ospf_apiclient *oclient;
 struct hash *prefix_table;
 struct hash *origin_table;
 
+int opaque_id;
+int counter;
+
 char  *logFile;
 char  *loggDir;
 int ospfnstop_sock;
@@ -64,7 +67,10 @@ int readConfigFile(char *filename , int isLogOnlyProcessing);
 int inject_adjacency_opaque_lsa(struct thread *t);
 void inject_name_opaque_lsa( struct name_prefix *np, unsigned int op_id);
 
-int ospfnstop(struct thread *t);
-int get_ospfnstop_sock(void);
-void setnonblocking(int sock);
+void init(void);
+void ospfn_stop_signal_handler(int sig);
+
+//int ospfnstop(struct thread *t);
+//int get_ospfnstop_sock(void);
+//void setnonblocking(int sock);
 #endif

@@ -13,7 +13,7 @@
 #include<string.h>
 #include<ctype.h>
 #include<stdlib.h>
-
+#include<signal.h>
 // header for making daemon process
 #include <unistd.h>
 #include <sys/types.h>
@@ -49,9 +49,6 @@
 
 #include <ccn/ccn.h>
 
-static u_int32_t counter = 1;
-static u_int32_t scount = 1;
-static int opaque_id=1;
 
 static int CCN_MAX_NEXT_HOPS=2;
 static char OSPFN_DEFAULT_CONFIG_FILE[] = "ospfn.conf";
@@ -95,6 +92,25 @@ struct ccn_neighbors *neighbors=NULL;
 /*------------------------------------------*/
 /*    FUNCTION DEFINITON                    */
 /*------------------------------------------*/
+
+void init(void){
+	counter=0;
+	opaque_id=1;
+	if (signal(SIGQUIT, ospfn_stop_signal_handler ) == SIG_ERR) {
+          perror("SIGQUIT install error\n");
+          exit(1);
+     	}
+	printf("Init called \n");
+}
+
+void ospfn_stop_signal_handler(int sig){
+     	printf("Signal handler called\n");	
+	signal(sig, SIG_IGN);
+    	writeLogg(logFile,"Signal for ospfn stop\n");
+        hash_iterate_delete_npt (prefix_table);
+	writeLogg(logFile,"Exiting ospfn...\n");	
+	exit(0);
+}
 
 //functions for processing ccn_neighbors list
 
@@ -759,7 +775,7 @@ void inject_name_opaque_lsa(struct name_prefix *np, unsigned int op_id )
 /*----------------------------------------------------------*/
 /*                     OSPFNSTOP RESPONSE                   */
 /*----------------------------------------------------------*/
-
+/*
 void setnonblocking(int sock)
 {
 	int opts;
@@ -776,27 +792,21 @@ void setnonblocking(int sock)
 	}
 	return;
 }
-
+*/
+/*
 int get_ospfnstop_sock(void){
 
-	struct sockaddr_un server_address; /* bind info structure */
-	int reuse_addr = 1;  /* Used so we can re-bind to our port
-				while a previous connection is still
-				in TIME_WAIT state. */
-	int sock;            /* The socket file descriptor for our "listening"
-                   	socket */
-	/* Obtain a file descriptor for our "listening" socket */
+	struct sockaddr_un server_address; 
+	int reuse_addr = 1;  
+	int sock; 
 	sock = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (sock < 0) {
 		perror("socket");
 	 	return 0;	
-		//exit(EXIT_FAILURE);
 	}
-	/* So that we can re-bind to it without TIME_WAIT problems */
 	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &reuse_addr,
 		sizeof(reuse_addr));
 
-	/* Set socket to non-blocking with our setnonblocking routine */
 	setnonblocking(sock);
 
 	memset((char *) &server_address, 0, sizeof(server_address));
@@ -809,11 +819,11 @@ int get_ospfnstop_sock(void){
 	  	return 0;	
 	}
 
-	/* Set up queue for incoming connections. */
 	listen(sock,1);
 	return sock;
 }
-
+*/
+/*
 int ospfnstop(struct thread *t){
 
 	printf("ospfnstop called: %4d\n",scount);
@@ -840,7 +850,7 @@ int ospfnstop(struct thread *t){
 	thread_add_timer (master, ospfnstop, oclient,5);	
 	return 0;
 }
-
+*/
 
 /* ---------------------------------------------------------
  * Main program 
@@ -855,7 +865,11 @@ int main(int argc, char *argv[])
     int daemon_mode = 0;
     int isLoggingEnabled = 1;
     char *config_file = OSPFN_DEFAULT_CONFIG_FILE;
-    
+
+    if (signal(SIGQUIT, ospfn_stop_signal_handler ) == SIG_ERR) {
+          perror("SIGQUIT install error\n");
+          exit(1);
+        }
 
     while ((res = getopt_long(argc, argv, "df:hn", longopts, 0)) != -1) {
         switch (res) {
@@ -880,7 +894,8 @@ int main(int argc, char *argv[])
 
     origin_table = origin_hash_create();
     prefix_table = prefix_hash_create();
-    ospfnstop_sock=get_ospfnstop_sock();
+    init(); 
+    //ospfnstop_sock=get_ospfnstop_sock();
     readConfigFile(config_file,1);
 
   // printf("%s from main\n",loggingDir);
@@ -932,7 +947,7 @@ int main(int argc, char *argv[])
     //insert code here for processing neighbors and ccnnames and call them 
     //process_adjacent();
 
-    thread_add_timer (master, ospfnstop, oclient,5);
+    //thread_add_timer (master, ospfnstop, oclient,5);
     thread_add_read (master, lsa_read, oclient, oclient->fd_async);
     //thread_add_timer (master, ospfnstop, oclient,5);
 
