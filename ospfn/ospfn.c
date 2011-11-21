@@ -107,7 +107,6 @@ void init(void){
 }
 
 void ospfn_stop_signal_handler(int sig){
-     	printf("Signal handler called\n");	
 	signal(sig, SIG_IGN);
     	writeLogg(logFile,"Signal for ospfn stop\n");
         hash_iterate_delete_npt (prefix_table);
