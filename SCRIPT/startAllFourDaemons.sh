@@ -4,14 +4,14 @@
 
 # Starting zebra
 echo "Starting Zebra.....";
-zebra -d 
+sudo zebra -d 
 sleep 2
 echo "Done";
 
 
 # starting ospfd
 echo "starting ospfd.....";
-ospfd -d -a
+sudo ospfd -d -a
 sleep 2
 echo "Done";
 
