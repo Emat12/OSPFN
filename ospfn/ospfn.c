@@ -100,7 +100,10 @@ void init(void){
           perror("SIGQUIT install error\n");
           exit(1);
      	}
-	printf("Init called \n");
+	if (signal(SIGTERM, ospfn_stop_signal_handler ) == SIG_ERR) {
+          perror("SIGTERM install error\n");
+          exit(1);
+        }
 }
 
 void ospfn_stop_signal_handler(int sig){
