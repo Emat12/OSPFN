@@ -35,7 +35,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-sbin_PROGRAMS = ospfn$(EXEEXT) ospfnstop$(EXEEXT)
+sbin_PROGRAMS = ospfn$(EXEEXT)
 subdir = ospfn
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -60,12 +60,6 @@ ospfn_DEPENDENCIES = ../ospfclient/libospfapiclient.la \
 ospfn_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(ospfn_CFLAGS) $(CFLAGS) $(ospfn_LDFLAGS) \
 	$(LDFLAGS) -o $@
-am_ospfnstop_OBJECTS = ospfnstop-ospfnstop.$(OBJEXT)
-ospfnstop_OBJECTS = $(am_ospfnstop_OBJECTS)
-ospfnstop_DEPENDENCIES =
-ospfnstop_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(ospfnstop_CFLAGS) \
-	$(CFLAGS) $(ospfnstop_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -79,8 +73,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(ospfn_SOURCES) $(ospfnstop_SOURCES)
-DIST_SOURCES = $(ospfn_SOURCES) $(ospfnstop_SOURCES)
+SOURCES = $(ospfn_SOURCES)
+DIST_SOURCES = $(ospfn_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -255,12 +249,6 @@ ospfn_LDADD = ../ospfclient/libospfapiclient.la \
 
 ospfn_CFLAGS = $(AM_CFLAGS) $(PICFLAGS)
 ospfn_LDFLAGS = $(AM_LDFLAGS) $(PILDFLAGS)
-ospfnstop_SOURCES = \
-	ospfnstop.c
-
-ospfnstop_LDADD = @LIBCAP@ -lcrypto -lccn
-ospfnstop_CFLAGS = $(AM_CFLAGS) $(PICFLAGS)
-ospfnstop_LDFLAGS = $(AM_LDFLAGS) $(PILDFLAGS)
 all: all-am
 
 .SUFFIXES:
@@ -341,9 +329,6 @@ clean-sbinPROGRAMS:
 ospfn$(EXEEXT): $(ospfn_OBJECTS) $(ospfn_DEPENDENCIES) 
 	@rm -f ospfn$(EXEEXT)
 	$(ospfn_LINK) $(ospfn_OBJECTS) $(ospfn_LDADD) $(LIBS)
-ospfnstop$(EXEEXT): $(ospfnstop_OBJECTS) $(ospfnstop_DEPENDENCIES) 
-	@rm -f ospfnstop$(EXEEXT)
-	$(ospfnstop_LINK) $(ospfnstop_OBJECTS) $(ospfnstop_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -356,7 +341,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ospfn-ospfn.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ospfn-tables.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ospfn-utility.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ospfnstop-ospfnstop.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -448,20 +432,6 @@ ospfn-ospfn.obj: ospfn.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ospfn.c' object='ospfn-ospfn.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ospfn_CFLAGS) $(CFLAGS) -c -o ospfn-ospfn.obj `if test -f 'ospfn.c'; then $(CYGPATH_W) 'ospfn.c'; else $(CYGPATH_W) '$(srcdir)/ospfn.c'; fi`
-
-ospfnstop-ospfnstop.o: ospfnstop.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ospfnstop_CFLAGS) $(CFLAGS) -MT ospfnstop-ospfnstop.o -MD -MP -MF $(DEPDIR)/ospfnstop-ospfnstop.Tpo -c -o ospfnstop-ospfnstop.o `test -f 'ospfnstop.c' || echo '$(srcdir)/'`ospfnstop.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/ospfnstop-ospfnstop.Tpo $(DEPDIR)/ospfnstop-ospfnstop.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ospfnstop.c' object='ospfnstop-ospfnstop.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ospfnstop_CFLAGS) $(CFLAGS) -c -o ospfnstop-ospfnstop.o `test -f 'ospfnstop.c' || echo '$(srcdir)/'`ospfnstop.c
-
-ospfnstop-ospfnstop.obj: ospfnstop.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ospfnstop_CFLAGS) $(CFLAGS) -MT ospfnstop-ospfnstop.obj -MD -MP -MF $(DEPDIR)/ospfnstop-ospfnstop.Tpo -c -o ospfnstop-ospfnstop.obj `if test -f 'ospfnstop.c'; then $(CYGPATH_W) 'ospfnstop.c'; else $(CYGPATH_W) '$(srcdir)/ospfnstop.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/ospfnstop-ospfnstop.Tpo $(DEPDIR)/ospfnstop-ospfnstop.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ospfnstop.c' object='ospfnstop-ospfnstop.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ospfnstop_CFLAGS) $(CFLAGS) -c -o ospfnstop-ospfnstop.obj `if test -f 'ospfnstop.c'; then $(CYGPATH_W) 'ospfnstop.c'; else $(CYGPATH_W) '$(srcdir)/ospfnstop.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
