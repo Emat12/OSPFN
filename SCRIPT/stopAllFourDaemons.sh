@@ -4,7 +4,8 @@
 
 # killing ospfn
 echo "Killing ospfn.....";
-kill `ps aux | grep ospfn | awk -F" " '{ print $2}'` 2> /dev/null;
+#kill `ps aux | grep ospfn | awk -F" " '{ print $2}'` 2> /dev/null;
+sh ospfnstop.sh
 echo "Done";
 sleep 1
 
@@ -22,5 +23,6 @@ sleep 1
 
 #killing ccnd
 echo "Killing ccnd.....";
-kill `ps aux | grep ccnd | awk -F" " '{ print $2}'` 2> /dev/null
+#kill `ps aux | grep ccnd | awk -F" " '{ print $2}'` 2> /dev/null
+ccndstop
 echo "Done";
