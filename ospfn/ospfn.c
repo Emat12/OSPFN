@@ -134,7 +134,7 @@ void pid_create(pid_t pid){
 		fclose(fp);	
 	}
 	else{
-	 	perror("pid create: can not create pid file /var/run/quagga-state/ospfn.pid\n");
+	 	perror("pid create: can not create pid file %s\n",OSPFN_PID_PATH);
 	 	exit(1);
 	}	
 }
