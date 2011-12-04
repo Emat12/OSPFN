@@ -62,6 +62,19 @@ char * strToLower(char *str)
 
 		return str;
 	}
+
+char * strrev(const char * string) {
+  int length = strlen(string);
+  char * result = malloc(length+1);
+  if( result != NULL ) {
+    int i,j;                                         
+    result[length] = '\0';
+    for (i=length-1,j=0; i >= 0; i--,j++ )  
+         result[j] = string[i];
+  }
+  return result;
+}
+
 unsigned int number_width(unsigned int number)
 	{
 

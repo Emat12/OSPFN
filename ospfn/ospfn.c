@@ -46,6 +46,8 @@
 #include "ospfd/ospf_api.h"
 #include "ospfclient/ospf_apiclient.h"
 #include "lib/stream.h"
+#include "ospfd/ospf_zebra.h"
+
 
 #include <ccn/ccn.h>
 
@@ -112,13 +114,19 @@ void ospfn_stop_signal_handler(int sig){
 	signal(sig, SIG_IGN);
     	writeLogg(logFile,"Signal for ospfn stop\n");
         hash_iterate_delete_npt (prefix_table);
+        ccn_destroy(&ccn_handle);	
 	writeLogg(logFile,"Exiting ospfn...\n");	
 	exit(0);
 }
 
 void pid_create(pid_t pid){
 	FILE *fp;
-	fp=fopen("/var/run/quagga-state/ospfn.pid","w");
+	char *OSPFN_PID_PATH=strrev(PATH_OSPFD_PID);	
+	//printf("%s\n",OSPFN_PID_PATH);	
+	OSPFN_PID_PATH[4]='n';
+	OSPFN_PID_PATH=strrev(OSPFN_PID_PATH);
+	//printf("%s\n",OSPFN_PID_PATH);		
+	fp=fopen(OSPFN_PID_PATH,"w");
 	if(fp!=NULL){
 		//pid_t pid=getpid();
 		//printf("%d\n",pid);	
@@ -884,7 +892,6 @@ int main(int argc, char *argv[])
     int daemon_mode = 0;
     int isLoggingEnabled = 1;
     char *config_file = OSPFN_DEFAULT_CONFIG_FILE;
-
 
     
     while ((res = getopt_long(argc, argv, "df:hn", longopts, 0)) != -1) {
