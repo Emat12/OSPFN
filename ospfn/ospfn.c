@@ -115,6 +115,7 @@ void ospfn_stop_signal_handler(int sig){
     	writeLogg(logFile,"Signal for ospfn stop\n");
         hash_iterate_delete_npt (prefix_table);
         ccn_destroy(&ccn_handle);	
+        ospf_apiclient_close(oclient);	
 	writeLogg(logFile,"Exiting ospfn...\n");	
 	exit(0);
 }
@@ -134,7 +135,7 @@ void pid_create(pid_t pid){
 		fclose(fp);	
 	}
 	else{
-	 	perror("pid create: can not create pid file \n");
+	 	perror("pid create: can not create pid file\n");
 	 	exit(1);
 	}	
 }
