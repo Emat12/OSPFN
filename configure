@@ -19600,6 +19600,10 @@ _ACEOF
 
 
 cat >>confdefs.h <<_ACEOF
+#define PATH_OSPFN_PID "$quagga_statedir/ospfn.pid"
+_ACEOF
+
+cat >>confdefs.h <<_ACEOF
 #define PATH_OSPF6D_PID "$quagga_statedir/ospf6d.pid"
 _ACEOF
 

@@ -637,6 +637,9 @@
 /* ospfd PID */
 #undef PATH_OSPFD_PID
 
+/* ospfn PID*/
+#undef PATH_OSPFN_PID
+
 /* ripd PID */
 #undef PATH_RIPD_PID
 
