@@ -2,7 +2,7 @@
 
 INCLUDES = @INCLUDES@ -I.. -I$(top_srcdir) -I$(top_srcdir)/lib
 
-sbin_PROGRAMS = ospfn
+sbin_PROGRAMS = ospfn ospfnstop
 
 ospfn_SOURCES = \
 	ccnx_opaque_lsa.c tables.c utility.c ccn_fib.c ospfn.c
@@ -12,4 +12,12 @@ ospfn_LDADD = ../ospfclient/libospfapiclient.la \
 
 ospfn_CFLAGS = $(AM_CFLAGS) $(PICFLAGS)
 ospfn_LDFLAGS = $(AM_LDFLAGS) $(PILDFLAGS)
+
+ospfnstop_SOURCES = \
+	ospfnstop.c
+
+ospfnstop_LDADD = @LIBCAP@ -lcrypto -lccn
+
+ospfnstop_CFLAGS = $(AM_CFLAGS) $(PICFLAGS)
+ospfnstop_LDFLAGS = $(AM_LDFLAGS) $(PILDFLAGS)
 
