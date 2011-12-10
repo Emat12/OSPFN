@@ -122,21 +122,15 @@ void ospfn_stop_signal_handler(int sig){
 
 void pid_create(pid_t pid){
 	FILE *fp;
-	char *OSPFN_PID_PATH=strrev(PATH_OSPFD_PID);	
-	//printf("%s\n",OSPFN_PID_PATH);	
-	OSPFN_PID_PATH[4]='n';
-	OSPFN_PID_PATH=strrev(OSPFN_PID_PATH);
-	//printf("%s\n",OSPFN_PID_PATH);		
-	fp=fopen(OSPFN_PID_PATH,"w");
+	//printf("%s\n",PATH_OSPFN_PID);	
+	fp=fopen(PATH_OSPFN_PID,"w");
 	if(fp!=NULL){
-		//pid_t pid=getpid();
-		//printf("%d\n",pid);	
 		fprintf(fp,"%d\n",pid+1);
 		fclose(fp);	
 	}
 	else{
-	 	perror("pid create: can not create pid file\n");
-	 	exit(1);
+	 	fprintf (stderr, "pid create: can not create pid file in %s directory\n", PATH_OSPFN_PID);	
+		exit(1);
 	}	
 }
 
