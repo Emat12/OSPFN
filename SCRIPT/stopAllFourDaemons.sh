@@ -5,7 +5,7 @@
 # killing ospfn
 echo "Killing ospfn.....";
 #kill `ps aux | grep ospfn | awk -F" " '{ print $2}'` 2> /dev/null;
-sh ospfnstop.sh
+ospfnstop
 echo "Done";
 sleep 1
 
