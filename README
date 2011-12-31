@@ -189,6 +189,7 @@ MY_OUTER_IPADDR=141.225.11.150
 PEER_INNER_IPADDR=10.0.1.9/30
 PEER_OUTER_IPADDR=150.135.82.77
 BOOTPROTO=none
+TTL=64
 
 Create hard links /etc/sysconfig/network-scripts/ifcfg-netlogictohobo and 
 /etc/sysconfig/networking/profiles/default/ifcfg-netlogictohobo 
