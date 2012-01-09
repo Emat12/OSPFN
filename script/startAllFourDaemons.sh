@@ -12,7 +12,7 @@ echo "Done";
 # starting ospfd
 echo "starting ospfd.....";
 sudo ospfd -d -a
-sleep 2
+sleep 10 
 echo "Done";
 
 
